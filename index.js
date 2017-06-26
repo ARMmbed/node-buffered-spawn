@@ -13,8 +13,14 @@ function execute(command, args, options) {
         let stdout = new Buffer('');
 
         // Buffer output, reporting progress
-        // Use cross or node's spawn according to options.crossSpawn
-        cp = options.crossSpawn ? crossSpawn(command, args, options) : spawn(command, args, options);
+        // Use cross or node's spawn or user function according to options.crossSpawn
+        if (typeof options.crossSpawn === 'function') {
+            cp = options.crossSpawn(command, args, options);
+        } else if (options.crossSpawn) {
+            cp = crossSpawn(command, args, options);
+        } else {
+            cp = spawn(command, args, options);
+        }
         delete options.crossSpawn;
 
         if (cp.stdout) {
